@@ -1,4 +1,4 @@
-package com.springboot.gangnaenglog_backend.entity.community;
+package com.springboot.gangnaenglog_backend.domain.community;
 
 import jakarta.persistence.*;
 import lombok.Getter;
