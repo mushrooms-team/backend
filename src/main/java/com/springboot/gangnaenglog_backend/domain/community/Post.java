@@ -32,10 +32,11 @@ public class Post {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Post(Member member, String title, String content) {
+    public Post(Member member, String title, String content, LocalDateTime createdAt) {
         this.member = member;
         this.title = title;
         this.content = content;
+        this.createdAt = createdAt;
     }
 
 }
