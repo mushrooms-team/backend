@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name="post")
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post {
@@ -33,12 +34,5 @@ public class Post {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Builder
-    public Post(Member member, String title, String content, LocalDateTime createdAt) {
-        this.member = member;
-        this.title = title;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
 
 }
