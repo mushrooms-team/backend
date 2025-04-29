@@ -1,6 +1,5 @@
 package com.springboot.gangnaenglog_backend.service;
 
-import com.springboot.gangnaenglog_backend.domain.community.Post;
 import com.springboot.gangnaenglog_backend.dto.PostRequestDto;
 import com.springboot.gangnaenglog_backend.dto.PostResponseDto;
 

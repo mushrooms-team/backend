@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommunityServiceImpl implements CommunityService {
+
     private final PostRepository postRepository;
 
     @Override
