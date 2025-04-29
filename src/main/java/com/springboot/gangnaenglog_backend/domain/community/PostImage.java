@@ -8,34 +8,28 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Table(name = "comment")
+@Table(name="post_image")
 @Entity
 @Getter
 @NoArgsConstructor
-public class Comment {
+public class PostImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    @Column(name = "image_url", nullable = false, length = 255)
+    private String imageUrl;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Comment(Member member, Post post, String content) {
-        this.member = member;
+    public PostImage(Post post, String imageUrl) {
         this.post = post;
-        this.content = content;
+        this.imageUrl = imageUrl;
     }
 }
-

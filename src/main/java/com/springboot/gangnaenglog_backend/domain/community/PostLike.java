@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Table(name = "comment")
-@Entity
-@Getter
+@Table(name = "post_like")
 @NoArgsConstructor
-public class Comment {
+@Getter
+@Entity
+public class PostLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,17 +26,14 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Comment(Member member, Post post, String content) {
+    public PostLike(Member member, Post post) {
         this.member = member;
         this.post = post;
-        this.content = content;
     }
-}
 
+
+}

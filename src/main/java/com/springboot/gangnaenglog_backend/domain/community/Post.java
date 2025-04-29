@@ -1,12 +1,14 @@
 package com.springboot.gangnaenglog_backend.domain.community;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 
+@Table(name="post")
 @Entity
 @Getter
 @NoArgsConstructor
@@ -29,6 +31,7 @@ public class Post {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Builder
     public Post(Member member, String title, String content) {
         this.member = member;
         this.title = title;
