@@ -1,12 +1,12 @@
 package com.springboot.gangnaenglog_backend.domain.community;
 
+import com.springboot.gangnaenglog_backend.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 
 @Table(name="post")
