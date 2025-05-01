@@ -1,8 +1,10 @@
 package com.springboot.gangnaenglog_backend.service.impl;
 
 import com.springboot.gangnaenglog_backend.domain.community.Post;
+import com.springboot.gangnaenglog_backend.domain.member.Member;
 import com.springboot.gangnaenglog_backend.dto.PostRequestDto;
 import com.springboot.gangnaenglog_backend.dto.PostResponseDto;
+import com.springboot.gangnaenglog_backend.repository.MemberRepository;
 import com.springboot.gangnaenglog_backend.repository.PostRepository;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -14,19 +16,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class CommunityServiceImpl implements CommunityService {
-    @Autowired
-    private PostRepository postRepository;
+
+    private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional
     public PostResponseDto createPost(PostRequestDto requestDto, Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버 없음"));
+
         Post post = Post.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                // .memberId(memberId)  // Post 엔티티에 memberId가 있을 경우 추가
+                .member(member)
                 .createdAt(LocalDateTime.now())
                 .build();
 
