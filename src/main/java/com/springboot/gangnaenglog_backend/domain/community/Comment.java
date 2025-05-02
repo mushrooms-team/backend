@@ -37,6 +37,7 @@ public class Comment {
         this.member = member;
         this.post = post;
         this.content = content;
+        this.createdAt = LocalDateTime.now();
     }
 }
 

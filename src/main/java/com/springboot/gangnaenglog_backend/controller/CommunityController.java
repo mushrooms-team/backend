@@ -1,8 +1,6 @@
 package com.springboot.gangnaenglog_backend.controller;
 
-import com.springboot.gangnaenglog_backend.dto.PostListResponseDto;
-import com.springboot.gangnaenglog_backend.dto.PostRequestDto;
-import com.springboot.gangnaenglog_backend.dto.PostResponseDto;
+import com.springboot.gangnaenglog_backend.dto.*;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +35,23 @@ public class CommunityController {
         PostResponseDto post = communityService.getPostDetail(id);
         return ResponseEntity.ok(post);
     }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentResponseDto>> getCommentsByPostId(@PathVariable Long id) {
+        List<CommentResponseDto> comments = communityService.getCommentsByPostId(id);
+        return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<CommentResponseDto> createComment(
+            @PathVariable Long id,
+            @RequestBody CommentRequestDto requestDto
+    ) {
+        Long memberId = 1L; // 임시
+        CommentResponseDto responseDto = communityService.createComment(id, memberId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
 
 
 
