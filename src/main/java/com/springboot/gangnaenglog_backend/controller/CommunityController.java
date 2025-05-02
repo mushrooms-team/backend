@@ -32,6 +32,12 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getAllPosts());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long id) {
+        PostResponseDto post = communityService.getPostDetail(id);
+        return ResponseEntity.ok(post);
+    }
+
 
 
 }

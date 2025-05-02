@@ -14,4 +14,5 @@ public interface CommunityService {
     PostResponseDto getPostDetail(Long postId);
 
     List<PostListResponseDto> getAllPosts();
+
 }
