@@ -2,13 +2,13 @@ package com.springboot.gangnaenglog_backend.service.impl;
 
 import com.springboot.gangnaenglog_backend.domain.community.Post;
 import com.springboot.gangnaenglog_backend.domain.member.Member;
+import com.springboot.gangnaenglog_backend.dto.PostListResponseDto;
 import com.springboot.gangnaenglog_backend.dto.PostRequestDto;
 import com.springboot.gangnaenglog_backend.dto.PostResponseDto;
 import com.springboot.gangnaenglog_backend.repository.MemberRepository;
 import com.springboot.gangnaenglog_backend.repository.PostRepository;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,4 +76,17 @@ public class CommunityServiceImpl implements CommunityService {
         );
 
     }
+
+    @Override
+    public List<PostListResponseDto> getAllPosts() {
+        return postRepository.findAll().stream()
+                .map(post -> new PostListResponseDto(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getMember().getNickname(),  // 작성자 정보 포함
+                        post.getCreatedAt().toLocalDate().toString()  // 날짜만 추출
+                ))
+                .collect(Collectors.toList());
+    }
+
 }

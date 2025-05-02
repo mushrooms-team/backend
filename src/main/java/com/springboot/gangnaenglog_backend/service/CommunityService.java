@@ -1,5 +1,6 @@
 package com.springboot.gangnaenglog_backend.service;
 
+import com.springboot.gangnaenglog_backend.dto.PostListResponseDto;
 import com.springboot.gangnaenglog_backend.dto.PostRequestDto;
 import com.springboot.gangnaenglog_backend.dto.PostResponseDto;
 
@@ -11,4 +12,6 @@ public interface CommunityService {
     List<PostResponseDto> getPostList();
 
     PostResponseDto getPostDetail(Long postId);
+
+    List<PostListResponseDto> getAllPosts();
 }
