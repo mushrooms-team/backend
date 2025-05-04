@@ -15,5 +15,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("minLikes") int minLikes,
             @Param("startDate") LocalDateTime startDate);
 
+    List<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String titleKeyword, String contentKeyword);
 
 }

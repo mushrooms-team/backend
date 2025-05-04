@@ -1,14 +1,11 @@
 package com.springboot.gangnaenglog_backend.service;
 
 import com.springboot.gangnaenglog_backend.dto.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface CommunityService {
     PostResponseDto createPost(PostRequestDto requestDto, Long memberId);
-
-    List<PostResponseDto> getPostList();
 
     PostResponseDto getPostDetail(Long postId);
 
@@ -25,4 +22,8 @@ public interface CommunityService {
     void unLikePost(Long memberId, Long postId);
 
     long getPostLikesCount(Long postId);
+
+    List<PostListResponseDto> searchPosts(String keyword);
+
+
 }

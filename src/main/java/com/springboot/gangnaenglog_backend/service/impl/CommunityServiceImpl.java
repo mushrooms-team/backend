@@ -53,18 +53,6 @@ public class CommunityServiceImpl implements CommunityService {
         );
     }
 
-    @Override
-    public List<PostResponseDto> getPostList() {
-        return postRepository.findAll().stream()
-                .map(post -> new PostResponseDto(
-                        post.getId(),
-                        post.getTitle(),
-                        post.getContent(),
-                        "닉네임임시",
-                        post.getCreatedAt().toString()
-                ))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public PostResponseDto getPostDetail(Long postId) {
@@ -88,7 +76,7 @@ public class CommunityServiceImpl implements CommunityService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getMember().getNickname(),
+                        "닉네임임시",
                         post.getCreatedAt().toLocalDate().toString()
                 ))
                 .collect(Collectors.toList());
@@ -182,6 +170,21 @@ public class CommunityServiceImpl implements CommunityService {
         return postLikeRepository.countByPostId(postId);
     }
 
+    @Override
+    public List<PostListResponseDto> searchPosts(String keyword) {
+        List<Post> posts = postRepository
+                .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword);
+
+        return posts.stream()
+                .map(post -> new PostListResponseDto(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getMember().getNickname(),
+                        post.getCreatedAt().toLocalDate().toString()
+                ))
+                .collect(Collectors.toList());
+    }
 
 
 

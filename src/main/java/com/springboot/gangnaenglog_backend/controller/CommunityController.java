@@ -74,10 +74,15 @@ public class CommunityController {
     }
 
 
-    @GetMapping("/{id}/likes/count")
+    @GetMapping("/{id}/like")
     public ResponseEntity<Long> getLikesCount(@PathVariable("id") Long postId) {
         long count = communityService.getPostLikesCount(postId);
         return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostListResponseDto>> searchPosts(@RequestParam String keyword) {
+        return ResponseEntity.ok(communityService.searchPosts(keyword));
     }
 
 
