@@ -136,7 +136,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public List<PostListResponseDto> getPopularPosts() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
-        List<Post> posts = postRepository.findPopularPosts(10, twoWeeksAgo);
+        List<Post> posts = postRepository.findPopularPosts(1, twoWeeksAgo);
 
         return posts.stream()
                 .map(post -> new PostListResponseDto(
@@ -169,6 +169,18 @@ public class CommunityServiceImpl implements CommunityService {
         postLikeRepository.save(postLike);
     }
 
+    @Transactional
+    @Override
+    public void unLikePost(Long memberId, Long postId) {
+        PostLike postLike = postLikeRepository.findByMemberIdAndPostId(memberId, postId)
+                .orElseThrow(() -> new IllegalStateException("좋아요를 누르지 않은 게시글입니다."));
+        postLikeRepository.delete(postLike);
+    }
+
+    @Override
+    public long getPostLikesCount(Long postId) {
+        return postLikeRepository.countByPostId(postId);
+    }
 
 
 

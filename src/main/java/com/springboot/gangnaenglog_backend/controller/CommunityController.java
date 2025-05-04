@@ -20,7 +20,7 @@ public class CommunityController {
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto) {
         //인증된 사용자 정보에서 memberId 추출
-        Long memberId = 1L; // 임시
+        Long memberId = 1L;
         PostResponseDto responseDto = communityService.createPost(requestDto, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -47,21 +47,37 @@ public class CommunityController {
             @PathVariable Long id,
             @RequestBody CommentRequestDto requestDto
     ) {
-        Long memberId = 1L; // 임시
+        Long memberId = 1L;
         CommentResponseDto responseDto = communityService.createComment(id, memberId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @GetMapping("/posts/popular")
+    @GetMapping("/popular")
     public ResponseEntity<List<PostListResponseDto>> getPopularPosts() {
         return ResponseEntity.ok(communityService.getPopularPosts());
     }
 
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> likePost(@PathVariable Long id) {
-        Long memberId = 1L; // 임시
+        Long memberId = 1L;
         communityService.likePost(memberId, id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<Void> unLikePost(
+            @PathVariable Long id,
+            @RequestParam Long memberId
+    ) {
+        communityService.unLikePost(memberId, id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{id}/likes/count")
+    public ResponseEntity<Long> getLikesCount(@PathVariable("id") Long postId) {
+        long count = communityService.getPostLikesCount(postId);
+        return ResponseEntity.ok(count);
     }
 
 
