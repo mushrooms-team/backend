@@ -1,4 +1,4 @@
-package com.springboot.gangnaenglog_backend.repository;
+package com.springboot.gangnaenglog_backend.repository.community;
 
 import com.springboot.gangnaenglog_backend.domain.community.Post;
 import org.springframework.data.jpa.repository.JpaRepository;

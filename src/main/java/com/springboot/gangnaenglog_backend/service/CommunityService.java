@@ -1,6 +1,6 @@
 package com.springboot.gangnaenglog_backend.service;
 
-import com.springboot.gangnaenglog_backend.dto.*;
+import com.springboot.gangnaenglog_backend.dto.community.*;
 
 import java.util.List;
 
