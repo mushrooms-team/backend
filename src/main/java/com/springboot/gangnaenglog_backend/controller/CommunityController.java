@@ -52,7 +52,17 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
+    @GetMapping("/posts/popular")
+    public ResponseEntity<List<PostListResponseDto>> getPopularPosts() {
+        return ResponseEntity.ok(communityService.getPopularPosts());
+    }
 
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likePost(@PathVariable Long id) {
+        Long memberId = 1L; // 임시
+        communityService.likePost(memberId, id);
+        return ResponseEntity.ok().build();
+    }
 
 
 }

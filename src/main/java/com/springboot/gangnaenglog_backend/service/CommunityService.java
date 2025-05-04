@@ -17,4 +17,8 @@ public interface CommunityService {
 
     CommentResponseDto createComment(Long postId, Long memberId, CommentRequestDto requestDto);
 
+    List<PostListResponseDto> getPopularPosts();
+
+    void likePost(Long memberId, Long postId);
+
 }

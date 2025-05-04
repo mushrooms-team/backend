@@ -2,10 +2,12 @@ package com.springboot.gangnaenglog_backend.service.impl;
 
 import com.springboot.gangnaenglog_backend.domain.community.Comment;
 import com.springboot.gangnaenglog_backend.domain.community.Post;
+import com.springboot.gangnaenglog_backend.domain.community.PostLike;
 import com.springboot.gangnaenglog_backend.domain.member.Member;
 import com.springboot.gangnaenglog_backend.dto.*;
 import com.springboot.gangnaenglog_backend.repository.CommentRepository;
 import com.springboot.gangnaenglog_backend.repository.MemberRepository;
+import com.springboot.gangnaenglog_backend.repository.PostLikeRepository;
 import com.springboot.gangnaenglog_backend.repository.PostRepository;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class CommunityServiceImpl implements CommunityService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Override
     @Transactional
@@ -84,6 +87,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .map(post -> new PostListResponseDto(
                         post.getId(),
                         post.getTitle(),
+                        post.getContent(),
                         post.getMember().getNickname(),
                         post.getCreatedAt().toLocalDate().toString()
                 ))
@@ -129,6 +133,41 @@ public class CommunityServiceImpl implements CommunityService {
         );
     }
 
+    @Override
+    public List<PostListResponseDto> getPopularPosts() {
+        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
+        List<Post> posts = postRepository.findPopularPosts(10, twoWeeksAgo);
+
+        return posts.stream()
+                .map(post -> new PostListResponseDto(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getMember().getNickname(),
+                        post.getCreatedAt().toLocalDate().toString()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public void likePost(Long memberId, Long postId) {
+        if (postLikeRepository.existsByMemberIdAndPostId(memberId, postId)) {
+            throw new IllegalStateException("이미 좋아요를 누른 게시글입니다.");
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        PostLike postLike = PostLike.builder()
+                .member(member)
+                .post(post)
+                .build();
+
+        postLikeRepository.save(postLike);
+    }
 
 
 

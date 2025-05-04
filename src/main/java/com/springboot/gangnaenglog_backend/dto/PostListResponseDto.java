@@ -9,6 +9,7 @@ import lombok.Getter;
 public class PostListResponseDto {
     private Long id;
     private String title;
+    private String content;
     private String nickname;
     private String createdAt;
 }

@@ -4,4 +4,6 @@ import com.springboot.gangnaenglog_backend.domain.community.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
+    boolean existsByMemberIdAndPostId(Long memberId, Long postId);
 }
+
