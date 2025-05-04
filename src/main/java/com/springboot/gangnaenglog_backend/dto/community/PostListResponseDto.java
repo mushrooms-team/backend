@@ -1,14 +1,14 @@
-package com.springboot.gangnaenglog_backend.dto;
+package com.springboot.gangnaenglog_backend.dto.community;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
-@AllArgsConstructor
 @Getter
-public class CommentResponseDto {
+@AllArgsConstructor
+public class PostListResponseDto {
     private Long id;
+    private String title;
     private String content;
     private String nickname;
     private String createdAt;

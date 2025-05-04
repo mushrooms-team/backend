@@ -1,6 +1,6 @@
 package com.springboot.gangnaenglog_backend.controller;
 
-import com.springboot.gangnaenglog_backend.dto.*;
+import com.springboot.gangnaenglog_backend.dto.community.*;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
 
 import lombok.RequiredArgsConstructor;

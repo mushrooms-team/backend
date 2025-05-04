@@ -1,4 +1,4 @@
-package com.springboot.gangnaenglog_backend.dto;
+package com.springboot.gangnaenglog_backend.dto.community;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
