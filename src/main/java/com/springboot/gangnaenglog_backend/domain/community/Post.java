@@ -1,6 +1,6 @@
 package com.springboot.gangnaenglog_backend.domain.community;
 
-import com.springboot.gangnaenglog_backend.domain.member.Member;
+import com.springboot.gangnaenglog_backend.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +23,8 @@ public class Post {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(length = 150, nullable = false)
     private String title;

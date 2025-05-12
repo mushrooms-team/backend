@@ -1,26 +1,28 @@
 package com.springboot.gangnaenglog_backend.controller;
 
-import com.springboot.gangnaenglog_backend.dto.JwtToken;
 import com.springboot.gangnaenglog_backend.dto.LoginRequest;
 import com.springboot.gangnaenglog_backend.dto.PasswordChangeRequest;
 import com.springboot.gangnaenglog_backend.dto.PasswordResetRequest;
 import com.springboot.gangnaenglog_backend.jwt.JwtTokenProvider;
-import com.springboot.gangnaenglog_backend.service.EMailService;
+import com.springboot.gangnaenglog_backend.service.EmailService;
 import com.springboot.gangnaenglog_backend.entity.User;
 import com.springboot.gangnaenglog_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 public class SignupController {
 
-    private final EMailService emailService;
+    private final EmailService emailService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public SignupController(EMailService emailService, UserService userService, JwtTokenProvider jwtTokenProvider) {
+    public SignupController(EmailService emailService, UserService userService, JwtTokenProvider jwtTokenProvider) {
         this.emailService = emailService;
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -36,7 +38,7 @@ public class SignupController {
     //인증코드 확인
     @PostMapping("/email-verification/check")
     public String verifyEmail(@RequestParam("email") String email, @RequestParam("code") int code) {
-        if (code == EMailService.getNumber()) {
+        if (code == EmailService.getNumber()) {
             return "인증 성공! 회원가입을 진행하세요.";
         } else {
             return "인증 실패! 올바른 인증번호를 입력하세요.";
@@ -57,10 +59,13 @@ public class SignupController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         if (userService.authenticateUser(request.getEmail(), request.getPassword())) {
-            Long userId = userService.getUserIdByEmail(request.getEmail());
-            String token = jwtTokenProvider.generateToken(userId);
+            String email = request.getEmail();
+            String token = jwtTokenProvider.generateToken(email);
 
-            return ResponseEntity.ok("로그인 성공!");
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
         }

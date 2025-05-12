@@ -3,13 +3,14 @@ package com.springboot.gangnaenglog_backend.service.impl;
 import com.springboot.gangnaenglog_backend.domain.community.Comment;
 import com.springboot.gangnaenglog_backend.domain.community.Post;
 import com.springboot.gangnaenglog_backend.domain.community.PostLike;
-import com.springboot.gangnaenglog_backend.domain.member.Member;
 import com.springboot.gangnaenglog_backend.dto.community.*;
+import com.springboot.gangnaenglog_backend.entity.User;
+import com.springboot.gangnaenglog_backend.repository.UserRepository;
 import com.springboot.gangnaenglog_backend.repository.community.CommentRepository;
-import com.springboot.gangnaenglog_backend.repository.community.MemberRepository;
 import com.springboot.gangnaenglog_backend.repository.community.PostLikeRepository;
 import com.springboot.gangnaenglog_backend.repository.community.PostRepository;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class CommunityServiceImpl implements CommunityService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
 
@@ -32,13 +33,13 @@ public class CommunityServiceImpl implements CommunityService {
     @Transactional
     public PostResponseDto createPost(PostRequestDto requestDto, Long memberId) {
 
-        Member member = memberRepository.findById(memberId)
+        User user = userRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버 없음"));
 
         Post post = Post.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .member(member)
+                .user(user)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -48,7 +49,7 @@ public class CommunityServiceImpl implements CommunityService {
                 savedPost.getId(),
                 savedPost.getTitle(),
                 savedPost.getContent(),
-                "닉네임임시", // 일단 더미 데이터.. 나중에 Member에서 가져오면 됨
+                post.getUser().getName(),
                 savedPost.getCreatedAt().toString()
         );
     }
@@ -63,7 +64,7 @@ public class CommunityServiceImpl implements CommunityService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                "닉네임임시",
+                post.getUser().getName(),
                 post.getCreatedAt().toString()
         );
 
@@ -76,7 +77,7 @@ public class CommunityServiceImpl implements CommunityService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        "닉네임임시",
+                        post.getUser().getName(),
                         post.getCreatedAt().toLocalDate().toString()
                 ))
                 .collect(Collectors.toList());
@@ -90,7 +91,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .map(comment -> new CommentResponseDto(
                         comment.getId(),
                         comment.getContent(),
-                        comment.getMember().getNickname(),
+                        comment.getUser().getName(),
                         comment.getCreatedAt().toString()
                 ))
                 .toList();
@@ -98,17 +99,17 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     @Transactional
-    public CommentResponseDto createComment(Long postId, Long memberId, CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(Long postId, Long userId, CommentRequestDto requestDto) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
-        Member member = memberRepository.findById(memberId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
 
         Comment comment = Comment.builder()
                 .content(requestDto.getContent())
                 .post(post)
-                .member(member)
+                .user(user)
                 .build();
 
         Comment saved = commentRepository.save(comment);
@@ -116,7 +117,7 @@ public class CommunityServiceImpl implements CommunityService {
         return new CommentResponseDto(
                 saved.getId(),
                 saved.getContent(),
-                member.getNickname(),
+                saved.getUser().getName(),
                 saved.getCreatedAt().toString()
         );
     }
@@ -131,7 +132,7 @@ public class CommunityServiceImpl implements CommunityService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getMember().getNickname(),
+                        post.getUser().getName(),
                         post.getCreatedAt().toLocalDate().toString()
                 ))
                 .collect(Collectors.toList());
@@ -139,18 +140,18 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Transactional
     @Override
-    public void likePost(Long memberId, Long postId) {
-        if (postLikeRepository.existsByMemberIdAndPostId(memberId, postId)) {
+    public void likePost(Long userId, Long postId) {
+        if (postLikeRepository.existsByUserIdAndPostId(userId, postId)) {
             throw new IllegalStateException("이미 좋아요를 누른 게시글입니다.");
         }
 
-        Member member = memberRepository.findById(memberId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
         PostLike postLike = PostLike.builder()
-                .member(member)
+                .user(user)
                 .post(post)
                 .build();
 
@@ -159,8 +160,8 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Transactional
     @Override
-    public void unLikePost(Long memberId, Long postId) {
-        PostLike postLike = postLikeRepository.findByMemberIdAndPostId(memberId, postId)
+    public void unLikePost(Long userId, Long postId) {
+        PostLike postLike = postLikeRepository.findByUserIdAndPostId(userId, postId)
                 .orElseThrow(() -> new IllegalStateException("좋아요를 누르지 않은 게시글입니다."));
         postLikeRepository.delete(postLike);
     }
@@ -180,7 +181,7 @@ public class CommunityServiceImpl implements CommunityService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getMember().getNickname(),
+                        post.getUser().getName(),
                         post.getCreatedAt().toLocalDate().toString()
                 ))
                 .collect(Collectors.toList());

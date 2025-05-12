@@ -2,10 +2,12 @@ package com.springboot.gangnaenglog_backend.controller;
 
 import com.springboot.gangnaenglog_backend.dto.community.*;
 import com.springboot.gangnaenglog_backend.service.CommunityService;
-
+import com.springboot.gangnaenglog_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +18,15 @@ import java.util.List;
 public class CommunityController {
 
     private final CommunityService communityService;
+    private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto) {
-        //인증된 사용자 정보에서 memberId 추출
-        Long memberId = 1L;
+    public ResponseEntity<PostResponseDto> createPost(
+            @RequestBody PostRequestDto requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        Long memberId = userService.getUserIdByEmail(email);
         PostResponseDto responseDto = communityService.createPost(requestDto, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -45,9 +51,11 @@ public class CommunityController {
     @PostMapping("/{id}/comments")
     public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable Long id,
-            @RequestBody CommentRequestDto requestDto
-    ) {
-        Long memberId = 1L;
+            @RequestBody CommentRequestDto requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        Long memberId = userService.getUserIdByEmail(email);
         CommentResponseDto responseDto = communityService.createComment(id, memberId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -58,8 +66,12 @@ public class CommunityController {
     }
 
     @PostMapping("/{id}/like")
-    public ResponseEntity<Void> likePost(@PathVariable Long id) {
-        Long memberId = 1L;
+    public ResponseEntity<Void> likePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        Long memberId = userService.getUserIdByEmail(email);
         communityService.likePost(memberId, id);
         return ResponseEntity.noContent().build();
     }
@@ -67,12 +79,13 @@ public class CommunityController {
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Void> unLikePost(
             @PathVariable Long id,
-            @RequestParam Long memberId
-    ) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        Long memberId = userService.getUserIdByEmail(email);
         communityService.unLikePost(memberId, id);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/{id}/like")
     public ResponseEntity<Long> getLikesCount(@PathVariable("id") Long postId) {
@@ -84,6 +97,4 @@ public class CommunityController {
     public ResponseEntity<List<PostListResponseDto>> searchPosts(@RequestParam String keyword) {
         return ResponseEntity.ok(communityService.searchPosts(keyword));
     }
-
-
 }

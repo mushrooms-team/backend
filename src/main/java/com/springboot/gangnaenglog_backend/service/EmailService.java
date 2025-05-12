@@ -6,13 +6,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EMailService {
+public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private static final String sendEmail = "gangnaenglog@gmail.com";
     private static int number; // 인증번호 변수
 
-    public EMailService(JavaMailSender javaMailSender) {
+    public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 

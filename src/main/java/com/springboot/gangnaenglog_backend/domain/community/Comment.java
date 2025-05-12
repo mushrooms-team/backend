@@ -1,7 +1,7 @@
 package com.springboot.gangnaenglog_backend.domain.community;
 
 
-import com.springboot.gangnaenglog_backend.domain.member.Member;
+import com.springboot.gangnaenglog_backend.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,8 +19,8 @@ public class Comment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
@@ -33,11 +33,11 @@ public class Comment {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Comment(Member member, Post post, String content) {
-        this.member = member;
+    public Comment(User user, Post post, String content) {
+        this.user = user;
         this.post = post;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
     }
+
 }
 

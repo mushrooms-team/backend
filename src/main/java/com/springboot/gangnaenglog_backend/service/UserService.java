@@ -41,10 +41,16 @@ public class UserService implements UserDetailsService {
 
     // 이메일로 사용자 ID 찾기
     public Long getUserIdByEmail(String email) {
+        System.out.println("🔍 getUserIdByEmail() 호출됨. 받은 이메일: [" + email + "]");
+
         return userRepository.findByEmail(email)
                 .map(User::getId)
-                .orElse(null);
+                .orElseThrow(() -> {
+                    System.out.println("❌ DB에서 이메일을 찾지 못함: [" + email + "]");
+                    return new IllegalArgumentException("해당 멤버 없음: " + email);
+                });
     }
+
 
     // Spring Security가 사용자 정보를 로딩할 때 사용
     @Override

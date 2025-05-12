@@ -3,6 +3,11 @@ package com.springboot.gangnaenglog_backend.jwt;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,28 +21,40 @@ public class JwtTokenProvider {
     //유효시간 - 1시간(추후 수정)
     private final long EXPIRATION_TIME = 1000 * 60 * 60;
 
+    private final UserDetailsService userDetailsService;
+
+    public JwtTokenProvider(@Lazy UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     //토큰 생성
-    public String generateToken(Long userId) {
+    public String generateToken(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 
         return Jwts.builder()
-                .setSubject(Long.toString(userId))
+                .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
-    //id 추출
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
+    public String getEmailFromToken(String token) {
+        return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
-                .getBody();
-
-        return Long.parseLong(claims.getSubject());
+                .getBody()
+                .getSubject();
     }
+
+    public Authentication getAuthentication(String token) {
+        String email = getEmailFromToken(token);
+        System.out.println(" 토큰에서 추출한 이메일: " + email);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
 
     //유효성검사
     public boolean validateToken(String token) {
