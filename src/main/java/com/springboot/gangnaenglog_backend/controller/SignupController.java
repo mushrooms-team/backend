@@ -1,8 +1,6 @@
 package com.springboot.gangnaenglog_backend.controller;
 
-import com.springboot.gangnaenglog_backend.dto.LoginRequest;
-import com.springboot.gangnaenglog_backend.dto.PasswordChangeRequest;
-import com.springboot.gangnaenglog_backend.dto.PasswordResetRequest;
+import com.springboot.gangnaenglog_backend.dto.*;
 import com.springboot.gangnaenglog_backend.jwt.JwtTokenProvider;
 import com.springboot.gangnaenglog_backend.service.EmailService;
 import com.springboot.gangnaenglog_backend.entity.User;
@@ -15,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v1/auth")
 public class SignupController {
 
@@ -28,39 +27,38 @@ public class SignupController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    //인증코드전송
+    // 인증코드 전송 - @RequestBody 사용
     @PostMapping("/email-verification")
-    public String sendEmail(@RequestParam("email") String email) {
-        int number = emailService.sendMail(email);
-        return "이메일 인증 번호가 발송되었습니다: " + number;
+    public ResponseEntity<String> sendEmail(@RequestBody EmailRequest request) {
+        int number = emailService.sendMail(request.getEmail());
+        return ResponseEntity.ok("이메일 인증 번호가 발송되었습니다: " + number);
     }
 
-    //인증코드 확인
+    // 인증코드 확인 - @RequestBody 사용
     @PostMapping("/email-verification/check")
-    public String verifyEmail(@RequestParam("email") String email, @RequestParam("code") int code) {
-        if (code == EmailService.getNumber()) {
-            return "인증 성공! 회원가입을 진행하세요.";
+    public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationRequest request) {
+        if (request.getCode() == EmailService.getNumber()) {
+            return ResponseEntity.ok("인증 성공! 회원가입을 진행하세요.");
         } else {
-            return "인증 실패! 올바른 인증번호를 입력하세요.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 실패! 올바른 인증번호를 입력하세요.");
         }
     }
 
-    //회원가입
+    // 회원가입
     @PostMapping("/signup")
-    public String signUp(@RequestBody User user) {
+    public ResponseEntity<String> signUp(@RequestBody User user) {
         if (userService.isEmailExist(user.getEmail())) {
-            return "이미 등록된 이메일입니다.";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 등록된 이메일입니다.");
         }
         userService.saveUser(user);
-        return "회원가입이 완료되었습니다!";
+        return ResponseEntity.ok("회원가입이 완료되었습니다!");
     }
 
-    //로그인
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         if (userService.authenticateUser(request.getEmail(), request.getPassword())) {
-            String email = request.getEmail();
-            String token = jwtTokenProvider.generateToken(email);
+            String token = jwtTokenProvider.generateToken(request.getEmail());
 
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
@@ -71,17 +69,18 @@ public class SignupController {
         }
     }
 
-    //로그아웃
+    // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
-
-    // 새로운 비밀번호가 일치하는지 확인
-    @PostMapping("/password-reset")
+    // 이메일 인증 후 비밀번호 재설정
+    @PutMapping("/password")
     public ResponseEntity<?> changePassword(@RequestBody PasswordResetRequest request) {
+        // 이메일과 비밀번호가 일치하는지 확인
         if (request.getNewPassword().equals(request.getConfirmPassword())) {
+            // 이메일로 해당 사용자를 찾아 비밀번호를 변경
             userService.updatePassword(request.getEmail(), request.getNewPassword());
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
         } else {
@@ -89,8 +88,9 @@ public class SignupController {
         }
     }
 
-    // 기존 비밀번호를 확인하고, 맞으면 새 비밀번호 변경
-    @PostMapping("/password-change")
+
+    // 기존 비밀번호 입력 후 변경
+    @PutMapping("/password-reset")
     public ResponseEntity<?> changePasswordWithCurrent(@RequestBody PasswordChangeRequest request) {
         if (userService.authenticateUser(request.getEmail(), request.getCurrentPassword())) {
             if (request.getNewPassword().equals(request.getConfirmNewPassword())) {
@@ -103,5 +103,17 @@ public class SignupController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("현재 비밀번호가 올바르지 않습니다.");
         }
     }
+
+    // 닉네임 중복 확인
+    @PostMapping("/name-check")
+    public ResponseEntity<String> checkName(@RequestBody NameCheckRequest request) {
+        User user = userService.getUserByName(request.getName());
+        if (user != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용 중인 닉네임입니다.");
+        } else {
+            return ResponseEntity.ok("사용 가능한 닉네임입니다.");
+        }
+    }
+
 
 }

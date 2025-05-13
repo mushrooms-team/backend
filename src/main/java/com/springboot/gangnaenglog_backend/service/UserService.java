@@ -72,15 +72,20 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    //비밀번호 재설정
+    // 비밀번호 재설정
     public void updatePassword(String email, String newPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setPassword(newPassword);
+            // 비밀번호 암호화 후 저장
+            user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
         }
     }
 
 
+
+    public User getUserByName(String name) {
+        return (User) userRepository.findByName(name).orElse(null);  // name으로 조회하여 없으면 null 반환
+    }
 }

@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/signup").permitAll()  //사용자 인증없이 사용할 수 있는 것
+                        .requestMatchers("/api/v1/auth/**").permitAll()  //사용자 인증없이 사용할 수 있는 것
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
