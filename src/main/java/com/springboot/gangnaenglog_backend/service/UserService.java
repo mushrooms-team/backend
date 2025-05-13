@@ -1,6 +1,7 @@
 package com.springboot.gangnaenglog_backend.service;
 
 import com.springboot.gangnaenglog_backend.entity.User;
+import com.springboot.gangnaenglog_backend.jwt.CustomUserDetails;
 import com.springboot.gangnaenglog_backend.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -57,19 +58,15 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 이메일의 사용자를 찾을 수 없습니다: " + email));
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .build();
+        return new CustomUserDetails(user);
+
     }
+
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 ID의 사용자를 찾을 수 없습니다: " + id));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .build();
+        return new CustomUserDetails(user);
     }
 
     // 비밀번호 재설정

@@ -50,9 +50,11 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         String email = getEmailFromToken(token);
-        System.out.println(" 토큰에서 추출한 이메일: " + email);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        System.out.println("토큰에서 추출한 이메일: " + email);
+
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
 
